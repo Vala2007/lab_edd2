@@ -1,29 +1,36 @@
 import customtkinter as ctk
 from tkinter import messagebox
+import random
 
 
 class Nodo:
-    def __init__(self, nombre, reto, respuesta_correcta):
+    def __init__(self, nombre, retos):
+        # Cada nodo ahora puede tener varios retos posibles
+        # Cada reto es una tupla: (pregunta, respuesta_correcta)
         self.nombre = nombre
-        self.reto = reto
-        self.respuesta_correcta = respuesta_correcta
+        self.retos = retos
         self.izquierda = None
         self.derecha = None
+
+    def obtener_reto(self):
+        """Devuelve un reto aleatorio (pregunta, respuesta_correcta)."""
+        return random.choice(self.retos)
 
 
 class JuegoCiberseguridadCTK:
     def __init__(self, root):
         self.root = root
         self.root.title("Aventura Cibernética 🧠")
-        self.root.geometry("700x450")
+        self.root.geometry("700x500")
 
         # Tema oscuro y color base
-        ctk.set_appearance_mode("dark")   # "dark" o "light"
+        ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("green")
 
         # Construcción del árbol
         self.raiz = self.construir_arbol()
         self.actual = self.raiz
+        self.pregunta_actual, self.respuesta_correcta = self.actual.obtener_reto()
 
         # Interfaz
         self.titulo = ctk.CTkLabel(root, text="🌐 Aventura Cibernética 🌐", font=("Arial Rounded MT Bold", 24))
@@ -37,7 +44,7 @@ class JuegoCiberseguridadCTK:
 
         self.entrada = ctk.CTkEntry(root, width=300, font=("Arial", 14))
         self.entrada.pack(pady=5)
-        self.entrada.bind("<Return>", lambda event: self.validar_respuesta())  # Enter = responder
+        self.entrada.bind("<Return>", lambda event: self.validar_respuesta())
 
         self.boton_responder = ctk.CTkButton(root, text="Responder", command=self.validar_respuesta, width=120, height=35)
         self.boton_responder.pack(pady=5)
@@ -46,10 +53,12 @@ class JuegoCiberseguridadCTK:
         self.frame_botones = ctk.CTkFrame(root)
         self.frame_botones.pack(pady=15)
 
-        self.boton_izquierda = ctk.CTkButton(self.frame_botones, text="← Izquierda", width=120, command=lambda: self.mover("izquierda"))
+        self.boton_izquierda = ctk.CTkButton(self.frame_botones, text="← Izquierda", width=120,
+                                             command=lambda: self.mover("izquierda"), state="disabled")
         self.boton_izquierda.grid(row=0, column=0, padx=10)
 
-        self.boton_derecha = ctk.CTkButton(self.frame_botones, text="Derecha →", width=120, command=lambda: self.mover("derecha"))
+        self.boton_derecha = ctk.CTkButton(self.frame_botones, text="Derecha →", width=120,
+                                           command=lambda: self.mover("derecha"), state="disabled")
         self.boton_derecha.grid(row=0, column=1, padx=10)
 
         self.boton_salir = ctk.CTkButton(root, text="Salir", fg_color="#ff4c4c", hover_color="#d12d2d",
@@ -59,34 +68,40 @@ class JuegoCiberseguridadCTK:
         self.mostrar_nodo()
 
     def construir_arbol(self):
-        central = Nodo("Nodo Central Seguro", "Has restaurado la red. ¡Felicitaciones, has ganado!", "")
+        central = Nodo("Nodo Central Seguro", [
+            ("Has restaurado la red. ¡Felicitaciones, has ganado!", "")
+        ])
 
-        firewall = Nodo(
-            "Firewall Perimetral",
-            "¿Cuál es la función principal de un firewall?\n"
-            "a) Proteger la red filtrando el tráfico\n"
-            "b) Acelerar internet\n"
-            "c) Guardar contraseñas",
-            "a"
-        )
+        firewall = Nodo("Firewall Perimetral", [
+            ("¿Cuál es la función principal de un firewall?\n"
+             "a) Proteger la red filtrando el tráfico\n"
+             "b) Acelerar internet\n"
+             "c) Guardar contraseñas", "a"),
+            ("¿Qué componente bloquea accesos no autorizados?\n"
+             "a) Antivirus\nb) Firewall\nc) Router", "b")
+        ])
 
-        correo = Nodo(
-            "Servidor de Correo",
-            "Identifica el ataque de phishing:\n"
-            "a) Correo con enlace sospechoso\n"
-            "b) Ataque DDoS\n"
-            "c) Virus físico",
-            "a"
-        )
+        correo = Nodo("Servidor de Correo", [
+            ("Identifica el ataque de phishing:\n"
+             "a) Correo con enlace sospechoso\n"
+             "b) Ataque DDoS\n"
+             "c) Virus físico", "a"),
+            ("¿Cuál de los siguientes es un correo fraudulento?\n"
+             "a) Mensaje con enlace desconocido\n"
+             "b) Comunicación interna oficial\n"
+             "c) Aviso del área de TI", "a")
+        ])
 
-        raiz = Nodo(
-            "Servidor Principal",
-            "Detecta la vulnerabilidad más grave:\n"
-            "a) Contraseña débil\n"
-            "b) Sistema actualizado\n"
-            "c) Antivirus activo",
-            "a"
-        )
+        raiz = Nodo("Servidor Principal", [
+            ("Detecta la vulnerabilidad más grave:\n"
+             "a) Contraseña débil\n"
+             "b) Sistema actualizado\n"
+             "c) Antivirus activo", "a"),
+            ("¿Qué práctica pone en riesgo la red?\n"
+             "a) Compartir contraseñas\n"
+             "b) Actualizar software\n"
+             "c) Usar contraseñas seguras", "a")
+        ])
 
         raiz.izquierda = firewall
         raiz.derecha = correo
@@ -97,40 +112,43 @@ class JuegoCiberseguridadCTK:
 
     def mostrar_nodo(self):
         self.texto_nodo.configure(text=f"🔹 Estás en: {self.actual.nombre}")
-        self.texto_reto.configure(text=self.actual.reto)
+        self.texto_reto.configure(text=self.pregunta_actual)
         self.entrada.delete(0, 'end')
-        self.entrada.focus()  # cursor automático en la caja
+        self.entrada.focus()
+        self.boton_izquierda.configure(state="disabled")
+        self.boton_derecha.configure(state="disabled")
 
     def validar_respuesta(self):
         respuesta = self.entrada.get().strip().lower()
 
-        # Nodo final
         if self.actual.nombre == "Nodo Central Seguro":
-            messagebox.showinfo("Victoria", self.actual.reto)
+            messagebox.showinfo("Victoria", self.pregunta_actual)
             self.root.quit()
             return
 
-        if respuesta != self.actual.respuesta_correcta:
-            messagebox.showwarning("Incorrecto", "❌ Respuesta incorrecta. Intenta nuevamente.")
+        if respuesta != self.respuesta_correcta:
+            messagebox.showwarning("Incorrecto", "❌ Respuesta incorrecta. Te llegó un nuevo desafío...")
+            # Genera un nuevo reto aleatorio
+            self.pregunta_actual, self.respuesta_correcta = self.actual.obtener_reto()
+            self.mostrar_nodo()
         else:
-            messagebox.showinfo("Correcto", "✅ Respuesta correcta. Ahora elige una dirección para avanzar.")
+            messagebox.showinfo("Correcto", "✅ Respuesta correcta. Puedes avanzar.")
+            self.boton_izquierda.configure(state="normal")
+            self.boton_derecha.configure(state="normal")
 
     def mover(self, direccion):
-        if self.actual.nombre == "Nodo Central Seguro":
+        if direccion == "izquierda" and self.actual.izquierda:
+            self.actual = self.actual.izquierda
+        elif direccion == "derecha" and self.actual.derecha:
+            self.actual = self.actual.derecha
+        else:
+            messagebox.showinfo("Movimiento inválido", "No hay nodo en esa dirección.")
             return
 
-        if direccion == "izquierda":
-            if self.actual.izquierda:
-                self.actual = self.actual.izquierda
-            else:
-                messagebox.showinfo("Movimiento inválido", "No hay nodo a la izquierda.")
-        elif direccion == "derecha":
-            if self.actual.derecha:
-                self.actual = self.actual.derecha
-            else:
-                messagebox.showinfo("Movimiento inválido", "No hay nodo a la derecha.")
-
+        # Al moverse, genera un nuevo reto
+        self.pregunta_actual, self.respuesta_correcta = self.actual.obtener_reto()
         self.mostrar_nodo()
+
 
 
 if __name__ == "__main__":
