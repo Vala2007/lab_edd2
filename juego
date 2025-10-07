@@ -1,0 +1,139 @@
+import customtkinter as ctk
+from tkinter import messagebox
+
+
+class Nodo:
+    def __init__(self, nombre, reto, respuesta_correcta):
+        self.nombre = nombre
+        self.reto = reto
+        self.respuesta_correcta = respuesta_correcta
+        self.izquierda = None
+        self.derecha = None
+
+
+class JuegoCiberseguridadCTK:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Aventura Cibernética 🧠")
+        self.root.geometry("700x450")
+
+        # Tema oscuro y color base
+        ctk.set_appearance_mode("dark")   # "dark" o "light"
+        ctk.set_default_color_theme("green")
+
+        # Construcción del árbol
+        self.raiz = self.construir_arbol()
+        self.actual = self.raiz
+
+        # Interfaz
+        self.titulo = ctk.CTkLabel(root, text="🌐 Aventura Cibernética 🌐", font=("Arial Rounded MT Bold", 24))
+        self.titulo.pack(pady=10)
+
+        self.texto_nodo = ctk.CTkLabel(root, text="", font=("Arial", 16, "bold"), wraplength=600)
+        self.texto_nodo.pack(pady=10)
+
+        self.texto_reto = ctk.CTkLabel(root, text="", font=("Arial", 14), wraplength=600)
+        self.texto_reto.pack(pady=10)
+
+        self.entrada = ctk.CTkEntry(root, width=300, font=("Arial", 14))
+        self.entrada.pack(pady=5)
+        self.entrada.bind("<Return>", lambda event: self.validar_respuesta())  # Enter = responder
+
+        self.boton_responder = ctk.CTkButton(root, text="Responder", command=self.validar_respuesta, width=120, height=35)
+        self.boton_responder.pack(pady=5)
+
+        # Botones de movimiento
+        self.frame_botones = ctk.CTkFrame(root)
+        self.frame_botones.pack(pady=15)
+
+        self.boton_izquierda = ctk.CTkButton(self.frame_botones, text="← Izquierda", width=120, command=lambda: self.mover("izquierda"))
+        self.boton_izquierda.grid(row=0, column=0, padx=10)
+
+        self.boton_derecha = ctk.CTkButton(self.frame_botones, text="Derecha →", width=120, command=lambda: self.mover("derecha"))
+        self.boton_derecha.grid(row=0, column=1, padx=10)
+
+        self.boton_salir = ctk.CTkButton(root, text="Salir", fg_color="#ff4c4c", hover_color="#d12d2d",
+                                         command=root.quit, width=100, height=30)
+        self.boton_salir.pack(pady=10)
+
+        self.mostrar_nodo()
+
+    def construir_arbol(self):
+        central = Nodo("Nodo Central Seguro", "Has restaurado la red. ¡Felicitaciones, has ganado!", "")
+
+        firewall = Nodo(
+            "Firewall Perimetral",
+            "¿Cuál es la función principal de un firewall?\n"
+            "a) Proteger la red filtrando el tráfico\n"
+            "b) Acelerar internet\n"
+            "c) Guardar contraseñas",
+            "a"
+        )
+
+        correo = Nodo(
+            "Servidor de Correo",
+            "Identifica el ataque de phishing:\n"
+            "a) Correo con enlace sospechoso\n"
+            "b) Ataque DDoS\n"
+            "c) Virus físico",
+            "a"
+        )
+
+        raiz = Nodo(
+            "Servidor Principal",
+            "Detecta la vulnerabilidad más grave:\n"
+            "a) Contraseña débil\n"
+            "b) Sistema actualizado\n"
+            "c) Antivirus activo",
+            "a"
+        )
+
+        raiz.izquierda = firewall
+        raiz.derecha = correo
+        firewall.izquierda = central
+        correo.derecha = central
+
+        return raiz
+
+    def mostrar_nodo(self):
+        self.texto_nodo.configure(text=f"🔹 Estás en: {self.actual.nombre}")
+        self.texto_reto.configure(text=self.actual.reto)
+        self.entrada.delete(0, 'end')
+        self.entrada.focus()  # cursor automático en la caja
+
+    def validar_respuesta(self):
+        respuesta = self.entrada.get().strip().lower()
+
+        # Nodo final
+        if self.actual.nombre == "Nodo Central Seguro":
+            messagebox.showinfo("Victoria", self.actual.reto)
+            self.root.quit()
+            return
+
+        if respuesta != self.actual.respuesta_correcta:
+            messagebox.showwarning("Incorrecto", "❌ Respuesta incorrecta. Intenta nuevamente.")
+        else:
+            messagebox.showinfo("Correcto", "✅ Respuesta correcta. Ahora elige una dirección para avanzar.")
+
+    def mover(self, direccion):
+        if self.actual.nombre == "Nodo Central Seguro":
+            return
+
+        if direccion == "izquierda":
+            if self.actual.izquierda:
+                self.actual = self.actual.izquierda
+            else:
+                messagebox.showinfo("Movimiento inválido", "No hay nodo a la izquierda.")
+        elif direccion == "derecha":
+            if self.actual.derecha:
+                self.actual = self.actual.derecha
+            else:
+                messagebox.showinfo("Movimiento inválido", "No hay nodo a la derecha.")
+
+        self.mostrar_nodo()
+
+
+if __name__ == "__main__":
+    root = ctk.CTk()
+    app = JuegoCiberseguridadCTK(root)
+    root.mainloop()
