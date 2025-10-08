@@ -110,7 +110,7 @@ class JuegoCiberseguridadCTK:
         self.mostrar_nodo()
 
 
-    # Árbol de nodos
+    # Árbol de nodos (Jose)
     def construir_arbol(self):
         self.nodo_central = Nodo("Nodo Central Seguro", [
             ("Has restaurado la red. ¡Felicitaciones, has ganado!", "")
