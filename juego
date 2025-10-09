@@ -31,9 +31,12 @@ class JuegoCiberseguridadCTK:
 
         # Seguimiento de progreso (Ajna)
         self.nodos_visitados = []
-        self.nodos_correctos = []
+        self.nodos_correctos = set()
+        self.nodos_pendientes = set()
+        self.nodos_usadas_en_pistas = set()
         self.contador_respuestas = 0
         self.mapa_visible = False
+        self.botones_mapa = {}
 
         # --- INTERFAZ ---
         self.main_frame = ctk.CTkFrame(root)
@@ -81,80 +84,60 @@ class JuegoCiberseguridadCTK:
         self.frame_info = ctk.CTkFrame(self.main_frame)
         self.frame_info.pack(side="right", fill="both", padx=10, pady=10)
 
-        # --- Mapa (inicialmente oculto) (Vala) ---
-        self.frame_mapa = ctk.CTkFrame(self.frame_info)
-        self.mapa_frame = ctk.CTkFrame(self.frame_mapa)
-        self.mapa_frame.pack(fill="both", expand=True, padx=10, pady=10)
-
-        # --- Lista de nodos visitados (Ajna) ---
+        # Lista de nodos visitados 
         self.titulo_visitados = ctk.CTkLabel(self.frame_info, text="🗺️ Nodos visitados",
                                             font=("Arial Rounded MT Bold", 16))
         self.titulo_visitados.pack(pady=10)
 
-        self.textbox_visitados = ctk.CTkTextbox(self.frame_info, width=250, height=150, font=("Consolas", 12))
-        self.textbox_visitados.pack(pady=5)
-        self.textbox_visitados.insert("end", "Nodos visitados:\n")
-        self.textbox_visitados.configure(state="disabled")
+        self.frame_nodos = ctk.CTkScrollableFrame(self.frame_info, width=250, height=250)
+        self.frame_nodos.pack(pady=5)
 
         # Pistas inteligentes (Ajna)
-        self.titulo_pistas = ctk.CTkLabel(self.frame_mapa, text="💡 Pistas inteligentes",
-                                          font=("Arial Rounded MT Bold", 16))
-        self.titulo_pistas.pack(pady=10)
-
         self.label_pista = ctk.CTkLabel(self.frame_info, text="Aún no hay pistas disponibles.",
                                         font=("Arial", 13), wraplength=250, justify="left")
-        self.label_pista.pack(pady=5)
+        self.label_pista.pack(pady=10)
+
+        # Mapa (inicialmente oculto) (Vala)
+        self.frame_mapa = ctk.CTkFrame(self.frame_info)
+        self.mapa_frame = ctk.CTkFrame(self.frame_mapa)
+        self.mapa_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         self.nodos_visitados.append(self.actual.nombre)
         self.actualizar_lista_nodos()
         self.mostrar_nodo()
 
 
-    # Árbol de nodos (Jose)
+    # --- Construcción del árbol --- ()
     def construir_arbol(self):
-        self.nodo_central = Nodo("Nodo Central Seguro", [
-            ("Has restaurado la red. ¡Felicitaciones, has ganado!", "")
-        ])
+        self.nodo_central = Nodo("Nodo Central Seguro", [("Has restaurado la red. ¡Felicitaciones, has ganado!", "")])
         ids = Nodo("Sistema IDS", [("¿Qué hace un sistema IDS?\n"
                                     "a) Detecta intrusiones\n"
                                     "b) Almacena correos\n"
                                     "c) Bloquea puertos USB", "a")])
-
-        proxy = Nodo("Proxy Seguro", [("¿Para qué sirve un proxy en la red?\n"
-                                       "a) Ocultar direcciones IP y filtrar tráfico\n"
-                                       "b) Acelerar el WiFi\n"
-                                       "c) Cambiar contraseñas", "a")])
-        
-        servidor_web = Nodo("Servidor Web", [("¿Qué tipo de ataque explota formularios web sin validación?\n"
+        proxy = Nodo("Proxy Seguro", [("¿Para qué sirve un proxy?\n"
+                                       "a) Ocultar IPs y filtrar tráfico\n"
+                                       "b) Acelerar WiFi\n"
+                                       "c) Guardar contraseñas", "a")])
+        servidor_web = Nodo("Servidor Web", [("¿Qué ataque explota formularios sin validación?\n"
                                               "a) Inyección SQL\n"
                                               "b) DDoS\n"
                                               "c) Ingeniería social", "a")])
-
-        base_datos = Nodo("Base de Datos", [("¿Qué medida protege mejor la base de datos?\n"
+        base_datos = Nodo("Base de Datos", [("¿Qué protege mejor una base de datos?\n"
                                             "a) Cifrar datos\n"
-                                            "b) Dejar acceso libre\n"
-                                            "c) Usar contraseñas simples", "a")])
-
-        firewall = Nodo("Firewall Perimetral", [
-            ("¿Cuál es la función principal de un firewall?\n"
-             "a) Proteger la red filtrando el tráfico\n"
-             "b) Acelerar internet\n"
-             "c) Guardar contraseñas", "a")
-        ])
-
-        correo = Nodo("Servidor de Correo", [
-            ("Identifica el ataque de phishing:\n"
-             "a) Correo con enlace sospechoso\n"
-             "b) Ataque DDoS\n"
-             "c) Virus físico", "a")
-        ])
-
-        raiz = Nodo("Servidor Principal", [
-            ("Detecta la vulnerabilidad más grave:\n"
-             "a) Contraseña débil\n"
-             "b) Sistema actualizado\n"
-             "c) Antivirus activo", "a")
-        ])
+                                            "b) Acceso libre\n"
+                                            "c) Contraseñas simples", "a")])
+        firewall = Nodo("Firewall Perimetral", [("¿Cuál es la función principal de un firewall?\n"
+                                                 "a) Filtrar tráfico\n"
+                                                 "b) Acelerar internet\n"
+                                                 "c) Guardar contraseñas", "a")])
+        correo = Nodo("Servidor de Correo", [("Identifica el phishing:\n"
+                                              "a) Correo con enlace sospechoso\n"
+                                              "b) DDoS\n"
+                                              "c) Virus físico", "a")])
+        raiz = Nodo("Servidor Principal", [("Detecta la vulnerabilidad más grave:\n"
+                                            "a) Contraseña débil\n"
+                                            "b) Sistema actualizado\n"
+                                            "c) Antivirus activo", "a")])
 
         raiz.izquierda = firewall
         raiz.derecha = correo
@@ -164,11 +147,11 @@ class JuegoCiberseguridadCTK:
         correo.izquierda = servidor_web
         correo.derecha = base_datos
         base_datos.derecha = self.nodo_central
-
+    
         return raiz
 
 
-    # Funciones del juego
+    # --- Mostrar nodo actual ---
     def mostrar_nodo(self):
         self.texto_nodo.configure(text=f"🔹 Estás en: {self.actual.nombre}")
         self.texto_reto.configure(text=self.pregunta_actual)
@@ -184,14 +167,39 @@ class JuegoCiberseguridadCTK:
         if self.mapa_visible:
             self.actualizar_mapa()
 
-    def actualizar_lista_nodos(self):
-        self.textbox_visitados.configure(state="normal")
-        self.textbox_visitados.delete(1.0, "end")
-        self.textbox_visitados.insert("end", "Nodos visitados:\n\n")
-        for nodo in self.nodos_visitados:
-            self.textbox_visitados.insert("end", f"✅ {nodo}\n")
-        self.textbox_visitados.configure(state="disabled")
 
+    # --- Lista de nodos visitados --- (Ajna)
+    def actualizar_lista_nodos(self):
+        for widget in self.frame_nodos.winfo_children():
+            widget.destroy()
+
+        for nodo in self.nodos_visitados:
+            boton = ctk.CTkButton(self.frame_nodos, text=f"✅ {nodo}", width=220, height=28,
+                                  command=lambda n=nodo: self.ir_a_nodo(n))
+            boton.pack(pady=3)
+
+
+    def ir_a_nodo(self, nombre_nodo):
+        nodo = self.buscar_nodo_por_nombre(self.raiz, nombre_nodo)
+        if nodo:
+            self.actual = nodo
+            self.pregunta_actual, self.respuesta_correcta = nodo.obtener_reto()
+            messagebox.showinfo("🧭 Navegación", f"Has vuelto al nodo: {nombre_nodo}")
+            self.mostrar_nodo()
+        else:
+            messagebox.showwarning("Error", "No se pudo encontrar el nodo en el árbol.")
+
+
+    def buscar_nodo_por_nombre(self, raiz, nombre):
+        if raiz is None:
+            return None
+        if raiz.nombre == nombre:
+            return raiz
+        return self.buscar_nodo_por_nombre(raiz.izquierda, nombre) or \
+               self.buscar_nodo_por_nombre(raiz.derecha, nombre)
+
+
+    # --- Validación de respuesta --- (Vala)
     def validar_respuesta(self):
         respuesta = self.entrada.get().strip().lower()
 
@@ -209,15 +217,15 @@ class JuegoCiberseguridadCTK:
             self.boton_izquierda.configure(state="normal")
             self.boton_derecha.configure(state="normal")
 
-            # Mostrar pista cada 2 respuestas correctas distintas (Ajna)
             if self.actual.nombre not in self.nodos_correctos:
-                self.nodos_correctos.append(self.actual.nombre)
+                self.nodos_correctos.add(self.actual.nombre)
                 self.contador_respuestas += 1
 
             if self.contador_respuestas % 2 == 0:
                 self.mostrar_pista()
 
 
+    # --- Movimiento entre nodos ---
     def mover(self, direccion):
         if direccion == "izquierda" and self.actual.izquierda:
             self.actual = self.actual.izquierda
@@ -230,12 +238,38 @@ class JuegoCiberseguridadCTK:
         self.pregunta_actual, self.respuesta_correcta = self.actual.obtener_reto()
         self.mostrar_nodo()
 
-   #Función para generar el mapa
+
+    # --- Pistas y mapa --- (Ajna)
+    def mostrar_pista(self):
+        if not self.mapa_visible:
+            self.frame_mapa.pack(fill="both", expand=True, padx=10, pady=10)
+            self.mapa_visible = True
+            self.actualizar_mapa()
+            self.root.after(1500, self.ocultar_mapa)
+
+        camino_actual = self.encontrar_camino(self.raiz, self.actual.nombre)
+        camino_objetivo = self.encontrar_camino(self.raiz, self.objetivo)
+        if not camino_actual or not camino_objetivo:
+            self.label_pista.configure(text="❓ No se pudo calcular la pista.")
+            return
+        if len(camino_actual[0]) < len(camino_objetivo[0]):
+            siguiente = camino_objetivo[0][len(camino_actual[0])]
+            self.label_pista.configure(text=f"💡 El objetivo está hacia la {siguiente} desde aquí.")
+        else:
+            self.label_pista.configure(text="🤔 Ya casi llegas al nodo final.")
+
+    #(Vala)
+    def ocultar_mapa(self): 
+        if self.mapa_visible:
+            self.frame_mapa.pack_forget()
+            self.mapa_visible = False
+            self.label_pista.configure(text="🕵️‍♂️ El mapa se ha ocultado. ¡Sigue explorando!")
+
+
     def actualizar_mapa(self):
         for widget in self.mapa_frame.winfo_children():
             widget.destroy()
-        
-        #Vala
+
         self.crear_label(self.raiz, 0, 3)
         self.crear_label(self.raiz.izquierda, 1, 1)
         self.crear_label(self.raiz.derecha, 1, 5)
@@ -245,12 +279,7 @@ class JuegoCiberseguridadCTK:
         correo = self.raiz.derecha
         self.crear_label(correo.izquierda, 2, 4)
         self.crear_label(correo.derecha, 2, 6)
-        self.crear_label(self.nodo_central, 3, 3)
-
-        for i in range(7):
-            self.mapa_frame.grid_columnconfigure(i, minsize=40)
-        for j in range(4):
-            self.mapa_frame.grid_rowconfigure(j, minsize=25)
+        self.crear_label(self.raiz.derecha.derecha.derecha, 3, 3)
 
     def crear_label(self, nodo, fila, col):
         if not nodo:
@@ -260,6 +289,7 @@ class JuegoCiberseguridadCTK:
                            fg_color=color, corner_radius=6, width=110, height=22)
         lbl.grid(row=fila, column=col, padx=4, pady=4)
 
+
     def encontrar_camino(self, raiz, destino, camino=None, nombres=None):
         if raiz is None:
             return None
@@ -267,10 +297,8 @@ class JuegoCiberseguridadCTK:
             camino = []
         if nombres is None:
             nombres = [raiz.nombre]
-
         if raiz.nombre == destino:
             return camino, nombres
-
         if raiz.izquierda:
             izq = self.encontrar_camino(raiz.izquierda, destino, camino + ["izquierda"], nombres + [raiz.izquierda.nombre])
             if izq:
@@ -280,47 +308,6 @@ class JuegoCiberseguridadCTK:
             if der:
                 return der
         return None
-
-    #Mapa aparece por unos segundos (Vala)
-    def mostrar_pista(self):
-        if not self.mapa_visible:
-            self.frame_mapa.pack(fill="both", expand=True, padx=10, pady=10)
-            self.mapa_visible = True
-            self.actualizar_mapa()
-            messagebox.showinfo("Pista desbloqueada", "🔍 Has desbloqueado el mapa de la red por unos segundos.")
-            self.root.after(1000, self.ocultar_mapa)
-
-        if self.actual.nombre == self.objetivo:
-            self.label_pista.configure(text="🏁 ¡Ya estás en el nodo objetivo!")
-            return
-
-        camino_actual = self.encontrar_camino(self.raiz, self.actual.nombre)
-        camino_objetivo = self.encontrar_camino(self.raiz, self.objetivo)
-
-        if not camino_actual or not camino_objetivo:
-            self.label_pista.configure(text="❓ No se pudo calcular la pista.")
-            return
-
-        for paso_actual, paso_objetivo in zip(camino_actual, camino_objetivo):
-            if paso_actual != paso_objetivo:
-                direccion = paso_objetivo
-                self.label_pista.configure(
-                    text=f"💡 El objetivo está hacia la {direccion} desde tu posición actual.")
-                return
-
-        if len(camino_actual) < len(camino_objetivo):
-            siguiente_paso = camino_objetivo[len(camino_actual)]
-            self.label_pista.configure(
-                text=f"💡 El objetivo está hacia la {siguiente_paso} desde aquí.")
-        else:
-            self.label_pista.configure(text="🤔 Ya casi llegas al nodo final.")
-
-    def ocultar_mapa(self):
-        """Oculta el mapa después de unos segundos."""
-        if self.mapa_visible:
-            self.frame_mapa.pack_forget()
-            self.mapa_visible = False
-            self.label_pista.configure(text="🕵️‍♂️ El mapa se ha ocultado. ¡Sigue explorando!")
 
 
 if __name__ == "__main__":
