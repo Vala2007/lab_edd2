@@ -99,15 +99,15 @@ class JuegoCiberseguridadCTK:
 
         # Mapa (inicialmente oculto) (Vala)
         self.frame_mapa = ctk.CTkFrame(self.frame_info)
-        self.mapa_frame = ctk.CTkFrame(self.frame_mapa)
+        self.mapa_frame = ctk.CTkFrame(self.frame_mapa, width=600, height=400)
+        self.mapa_frame.pack_propagate(False)
         self.mapa_frame.pack(fill="both", expand=True, padx=10, pady=10)
-
         self.nodos_visitados.append(self.actual.nombre)
         self.actualizar_lista_nodos()
         self.mostrar_nodo()
 
 
-    # --- Construcción del árbol --- ()
+    # --- Construcción del árbol --- (Jose)
     def construir_arbol(self):
         self.nodo_central = Nodo("Nodo Central Seguro", [("Has restaurado la red. ¡Felicitaciones, has ganado!", "")])
         ids = Nodo("Sistema IDS", [("¿Qué hace un sistema IDS?\n"
@@ -138,6 +138,21 @@ class JuegoCiberseguridadCTK:
                                             "a) Contraseña débil\n"
                                             "b) Sistema actualizado\n"
                                             "c) Antivirus activo", "a")])
+        logs_servidor = Nodo("Logs de Servidor", [
+                                            ("Si ves muchos intentos de contraseña fallidos en los registros de acceso, ¿qué puede estar pasando?\n"
+                                            "a) Alguien está probando muchas contraseñas para adivinarla\n"
+                                            "b) El computador está apagado\n"
+                                            "c) Hay un problema con el teclado", "a"),
+                                            ("Si la computadora guarda una lista de todo lo que pasó (los 'logs'), ¿para qué sirve mirarla?\n"
+                                            "a) Para ver si tengo algo mal escrito"
+                                            "b) Para encontrar si un ladrón entró a la red\n"
+                                            "c) Para saber el clima de mañana", "b")])
+
+        gestion_parches = Nodo("Gestión de Parches", [
+                                                    ("Cuando un programa tiene un error de seguridad, el fabricante envía una 'actualización'. ¿Qué debes hacer?\n"
+                                                    "a) Instalar la actualización de inmediato\n"
+                                                    "b) Esperar un año para instalarla\n"
+                                                    "c) Borrar el programa", "a") ])
 
         raiz.izquierda = firewall
         raiz.derecha = correo
@@ -147,6 +162,11 @@ class JuegoCiberseguridadCTK:
         correo.izquierda = servidor_web
         correo.derecha = base_datos
         base_datos.derecha = self.nodo_central
+
+        ids.izquierda = logs_servidor
+        ids.derecha = gestion_parches
+        gestion_parches.derecha = self.nodo_central
+        logs_servidor.derecha = self.nodo_central
     
         return raiz
 
@@ -280,13 +300,25 @@ class JuegoCiberseguridadCTK:
         self.crear_label(correo.izquierda, 2, 4)
         self.crear_label(correo.derecha, 2, 6)
         self.crear_label(self.raiz.derecha.derecha.derecha, 3, 3)
+        ids = fw.izquierda
+        self.crear_label(ids.izquierda, 3, 0) 
+        self.crear_label(ids.derecha, 3, 1) 
 
     def crear_label(self, nodo, fila, col):
         if not nodo:
             return
         color = "#2ecc71" if nodo.nombre in self.nodos_visitados else "#555555"
-        lbl = ctk.CTkLabel(self.mapa_frame, text=nodo.nombre, font=("Arial", 10, "bold"),
-                           fg_color=color, corner_radius=6, width=110, height=22)
+        lbl = ctk.CTkLabel(
+            self.mapa_frame,
+            text=nodo.nombre,
+            font=("Arial", 9, "bold"),
+            fg_color=color,
+            corner_radius=10,
+            width=35,       
+            height=20,       
+            wraplength=90,   
+            justify="center" 
+        )
         lbl.grid(row=fila, column=col, padx=4, pady=4)
 
 
