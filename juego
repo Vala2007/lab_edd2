@@ -109,66 +109,93 @@ class JuegoCiberseguridadCTK:
 
     # --- Construcción del árbol --- (Jose)
     def construir_arbol(self):
-        self.nodo_central = Nodo("Nodo Central Seguro", [("Has restaurado la red. ¡Felicitaciones, has ganado!", "")])
+        self.nodo_central = Nodo("Nodo Central Seguro", [
+            ("Has restaurado la red. ¡Felicitaciones, has ganado!", "")
+        ])
+
         ids = Nodo("Sistema IDS", [("¿Qué hace un sistema IDS?\n"
                                     "a) Detecta intrusiones\n"
                                     "b) Almacena correos\n"
                                     "c) Bloquea puertos USB", "a")])
         proxy = Nodo("Proxy Seguro", [("¿Para qué sirve un proxy?\n"
-                                       "a) Ocultar IPs y filtrar tráfico\n"
-                                       "b) Acelerar WiFi\n"
-                                       "c) Guardar contraseñas", "a")])
+                                    "a) Ocultar IPs y filtrar tráfico\n"
+                                    "b) Acelerar WiFi\n"
+                                    "c) Guardar contraseñas", "a")])
         servidor_web = Nodo("Servidor Web", [("¿Qué ataque explota formularios sin validación?\n"
-                                              "a) Inyección SQL\n"
-                                              "b) DDoS\n"
-                                              "c) Ingeniería social", "a")])
+                                            "a) Inyección SQL\n"
+                                            "b) DDoS\n"
+                                            "c) Ingeniería social", "a")])
         base_datos = Nodo("Base de Datos", [("¿Qué protege mejor una base de datos?\n"
                                             "a) Cifrar datos\n"
                                             "b) Acceso libre\n"
                                             "c) Contraseñas simples", "a")])
         firewall = Nodo("Firewall Perimetral", [("¿Cuál es la función principal de un firewall?\n"
-                                                 "a) Filtrar tráfico\n"
-                                                 "b) Acelerar internet\n"
-                                                 "c) Guardar contraseñas", "a")])
+                                                "a) Filtrar tráfico\n"
+                                                "b) Acelerar internet\n"
+                                                "c) Guardar contraseñas", "a")])
         correo = Nodo("Servidor de Correo", [("Identifica el phishing:\n"
-                                              "a) Correo con enlace sospechoso\n"
-                                              "b) DDoS\n"
-                                              "c) Virus físico", "a")])
+                                            "a) Correo con enlace sospechoso\n"
+                                            "b) DDoS\n"
+                                            "c) Virus físico", "a")])
         raiz = Nodo("Servidor Principal", [("Detecta la vulnerabilidad más grave:\n"
                                             "a) Contraseña débil\n"
                                             "b) Sistema actualizado\n"
                                             "c) Antivirus activo", "a")])
         logs_servidor = Nodo("Logs de Servidor", [
-                                            ("Si ves muchos intentos de contraseña fallidos en los registros de acceso, ¿qué puede estar pasando?\n"
-                                            "a) Alguien está probando muchas contraseñas para adivinarla\n"
-                                            "b) El computador está apagado\n"
-                                            "c) Hay un problema con el teclado", "a"),
-                                            ("Si la computadora guarda una lista de todo lo que pasó (los 'logs'), ¿para qué sirve mirarla?\n"
-                                            "a) Para ver si tengo algo mal escrito"
-                                            "b) Para encontrar si un ladrón entró a la red\n"
-                                            "c) Para saber el clima de mañana", "b")])
-
+            ("Si ves muchos intentos de contraseña fallidos en los registros, ¿qué puede estar pasando?\n"
+            "a) Alguien está probando muchas contraseñas\n"
+            "b) El computador está apagado\n"
+            "c) Hay un problema con el teclado", "a")
+        ])
         gestion_parches = Nodo("Gestión de Parches", [
-                                                    ("Cuando un programa tiene un error de seguridad, el fabricante envía una 'actualización'. ¿Qué debes hacer?\n"
-                                                    "a) Instalar la actualización de inmediato\n"
-                                                    "b) Esperar un año para instalarla\n"
-                                                    "c) Borrar el programa", "a") ])
+            ("Cuando un programa tiene un error de seguridad, el fabricante envía una 'actualización'. ¿Qué debes hacer?\n"
+            "a) Instalar la actualización de inmediato\n"
+            "b) Esperar un año para instalarla\n"
+            "c) Borrar el programa", "a")
+        ])
 
-        raiz.izquierda = firewall
-        raiz.derecha = correo
-        firewall.izquierda = ids
-        firewall.derecha = proxy
-        proxy.derecha = self.nodo_central
-        correo.izquierda = servidor_web
-        correo.derecha = base_datos
-        base_datos.derecha = self.nodo_central
+        configuracion = random.choice([1, 2, 3])
 
-        ids.izquierda = logs_servidor
-        ids.derecha = gestion_parches
-        gestion_parches.derecha = self.nodo_central
-        logs_servidor.derecha = self.nodo_central
-    
+        if configuracion == 1:
+            raiz.izquierda = firewall
+            raiz.derecha = correo
+            firewall.izquierda = ids
+            firewall.derecha = proxy
+            proxy.derecha = self.nodo_central
+            correo.izquierda = servidor_web
+            correo.derecha = base_datos
+            ids.izquierda = logs_servidor
+            ids.derecha = gestion_parches
+
+        elif configuracion == 2:
+            raiz.izquierda = proxy
+            raiz.derecha = firewall
+            proxy.izquierda = ids
+            proxy.derecha = servidor_web
+            servidor_web.derecha = self.nodo_central
+            firewall.izquierda = base_datos
+            firewall.derecha = correo
+            ids.izquierda = logs_servidor
+            ids.derecha = gestion_parches
+
+        else:  
+            raiz.izquierda = correo
+            raiz.derecha = base_datos
+            correo.izquierda = firewall
+            correo.derecha = ids
+            ids.izquierda = gestion_parches
+            ids.derecha = proxy
+            base_datos.derecha = servidor_web
+            proxy.derecha = self.nodo_central  
+            firewall.izquierda = logs_servidor
+
+        # Asegurar que el nodo central no tenga hijos
+        self.nodo_central.izquierda = None
+        self.nodo_central.derecha = None
+
+        print(f"🌲 Configuración seleccionada: {configuracion}")
         return raiz
+
 
 
     # --- Mostrar nodo actual ---
@@ -265,18 +292,39 @@ class JuegoCiberseguridadCTK:
             self.frame_mapa.pack(fill="both", expand=True, padx=10, pady=10)
             self.mapa_visible = True
             self.actualizar_mapa()
-            self.root.after(1500, self.ocultar_mapa)
+            self.root.after(1800, self.ocultar_mapa)
 
         camino_actual = self.encontrar_camino(self.raiz, self.actual.nombre)
         camino_objetivo = self.encontrar_camino(self.raiz, self.objetivo)
+
         if not camino_actual or not camino_objetivo:
             self.label_pista.configure(text="❓ No se pudo calcular la pista.")
             return
-        if len(camino_actual[0]) < len(camino_objetivo[0]):
-            siguiente = camino_objetivo[0][len(camino_actual[0])]
-            self.label_pista.configure(text=f"💡 El objetivo está hacia la {siguiente} desde aquí.")
+
+        direcciones_actual, nombres_actual = camino_actual
+        direcciones_objetivo, nombres_objetivo = camino_objetivo
+
+        # Si ya estamos en el nodo final
+        if self.actual.nombre == self.objetivo:
+            self.label_pista.configure(text="🏁 ¡Ya estás en el Nodo Central Seguro!")
+            return
+
+        # Caso 1: si el nodo actual aparece dentro del camino del objetivo
+        if self.actual.nombre in nombres_objetivo:
+            idx = nombres_objetivo.index(self.actual.nombre)
+            if idx < len(direcciones_objetivo):
+                siguiente_dir = direcciones_objetivo[idx]
+                siguiente_nodo = nombres_objetivo[idx + 1]
+                self.label_pista.configure(
+                    text=f"💡 Desde aquí, el objetivo está hacia la {siguiente_dir}"
+                )
+            else:
+                self.label_pista.configure(text="🤔 Ya casi llegas al nodo final.")
         else:
-            self.label_pista.configure(text="🤔 Ya casi llegas al nodo final.")
+            # Caso 2: si el nodo actual no está en el camino correcto
+            self.label_pista.configure(
+                text="Estás en una rama diferente"
+            )
 
     #(Vala)
     def ocultar_mapa(self): 
@@ -289,20 +337,23 @@ class JuegoCiberseguridadCTK:
     def actualizar_mapa(self):
         for widget in self.mapa_frame.winfo_children():
             widget.destroy()
+        
+        self.dibujar_arbol_recursivo(self.raiz, 0, 0, 8)  #8 es el ancho total inicial
 
-        self.crear_label(self.raiz, 0, 3)
-        self.crear_label(self.raiz.izquierda, 1, 1)
-        self.crear_label(self.raiz.derecha, 1, 5)
-        fw = self.raiz.izquierda
-        self.crear_label(fw.izquierda, 2, 0)
-        self.crear_label(fw.derecha, 2, 2)
-        correo = self.raiz.derecha
-        self.crear_label(correo.izquierda, 2, 4)
-        self.crear_label(correo.derecha, 2, 6)
-        self.crear_label(self.raiz.derecha.derecha.derecha, 3, 3)
-        ids = fw.izquierda
-        self.crear_label(ids.izquierda, 3, 0) 
-        self.crear_label(ids.derecha, 3, 1) 
+    def dibujar_arbol_recursivo(self, nodo, nivel, col_izquierda, ancho_total):
+        if not nodo:
+            return
+        
+        columna = col_izquierda + ancho_total // 2
+        
+        self.crear_label(nodo, nivel, columna)
+        
+        if nodo.izquierda or nodo.derecha:
+            nuevo_ancho = ancho_total // 2
+            if nodo.izquierda:
+                self.dibujar_arbol_recursivo(nodo.izquierda, nivel + 1, col_izquierda, nuevo_ancho)
+            if nodo.derecha:
+                self.dibujar_arbol_recursivo(nodo.derecha, nivel + 1, col_izquierda + nuevo_ancho, nuevo_ancho)
 
     def crear_label(self, nodo, fila, col):
         if not nodo:
