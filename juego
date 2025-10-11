@@ -38,11 +38,10 @@ class JuegoCiberseguridadCTK:
         self.mapa_visible = False
         self.botones_mapa = {}
 
-        # --- INTERFAZ ---
+        # Interfaz
         self.main_frame = ctk.CTkFrame(root)
         self.main_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-        # Panel de juego principal
         self.frame_juego = ctk.CTkFrame(self.main_frame)
         self.frame_juego.pack(side="left", fill="both", expand=True, padx=10)
 
@@ -80,7 +79,7 @@ class JuegoCiberseguridadCTK:
                                          hover_color="#d12d2d", command=root.quit, width=100, height=30)
         self.boton_salir.pack(pady=10)
 
-        # --- PANEL DERECHO ---
+        # Panel derecho
         self.frame_info = ctk.CTkFrame(self.main_frame)
         self.frame_info.pack(side="right", fill="both", padx=10, pady=10)
 
@@ -92,7 +91,7 @@ class JuegoCiberseguridadCTK:
         self.frame_nodos = ctk.CTkScrollableFrame(self.frame_info, width=250, height=250)
         self.frame_nodos.pack(pady=5)
 
-        # Pistas inteligentes (Ajna)
+        # Pistas (Ajna)
         self.label_pista = ctk.CTkLabel(self.frame_info, text="Aún no hay pistas disponibles.",
                                         font=("Arial", 13), wraplength=250, justify="left")
         self.label_pista.pack(pady=10)
@@ -107,52 +106,148 @@ class JuegoCiberseguridadCTK:
         self.mostrar_nodo()
 
 
-    # --- Construcción del árbol --- (Jose)
+    # Construcción del árbol (Jose)
     def construir_arbol(self):
         self.nodo_central = Nodo("Nodo Central Seguro", [
             ("Has restaurado la red. ¡Felicitaciones, has ganado!", "")
         ])
 
-        ids = Nodo("Sistema IDS", [("¿Qué hace un sistema IDS?\n"
-                                    "a) Detecta intrusiones\n"
-                                    "b) Almacena correos\n"
-                                    "c) Bloquea puertos USB", "a")])
-        proxy = Nodo("Proxy Seguro", [("¿Para qué sirve un proxy?\n"
-                                    "a) Ocultar IPs y filtrar tráfico\n"
-                                    "b) Acelerar WiFi\n"
-                                    "c) Guardar contraseñas", "a")])
-        servidor_web = Nodo("Servidor Web", [("¿Qué ataque explota formularios sin validación?\n"
-                                            "a) Inyección SQL\n"
-                                            "b) DDoS\n"
-                                            "c) Ingeniería social", "a")])
-        base_datos = Nodo("Base de Datos", [("¿Qué protege mejor una base de datos?\n"
-                                            "a) Cifrar datos\n"
-                                            "b) Acceso libre\n"
-                                            "c) Contraseñas simples", "a")])
-        firewall = Nodo("Firewall Perimetral", [("¿Cuál es la función principal de un firewall?\n"
-                                                "a) Filtrar tráfico\n"
-                                                "b) Acelerar internet\n"
-                                                "c) Guardar contraseñas", "a")])
-        correo = Nodo("Servidor de Correo", [("Identifica el phishing:\n"
-                                            "a) Correo con enlace sospechoso\n"
-                                            "b) DDoS\n"
-                                            "c) Virus físico", "a")])
-        raiz = Nodo("Servidor Principal", [("Detecta la vulnerabilidad más grave:\n"
-                                            "a) Contraseña débil\n"
-                                            "b) Sistema actualizado\n"
-                                            "c) Antivirus activo", "a")])
+        ids = Nodo("Sistema IDS", [
+            ("¿Qué hace un sistema IDS?\n"
+            "a) Detecta intrusiones\n"
+            "b) Administra contraseñas\n"
+            "c) Realiza copias de seguridad", "a"),
+            ("¿Cuál es una limitación común de los IDS?\n"
+            "a) No requieren configuración\n"
+            "b) No detectan ataques nuevos o desconocidos\n"
+            "c) No consumen memoria", "b"),
+            ("¿Qué tipo de IDS analiza el tráfico en tiempo real?\n"
+            "a) IDS basado en host\n"
+            "b) IDS basado en red\n"
+            "c) IDS híbrido", "b")
+        ])
+
+        proxy = Nodo("Proxy Seguro", [
+            ("¿Para qué sirve un proxy?\n"
+            "a) Cifrar discos duros\n"
+            "b) Analizar paquetes físicos\n"
+            "c) Ocultar IPs y filtrar tráfico", "c"),
+            ("¿Qué tipo de proxy almacena temporalmente contenido web?\n"
+            "a) Proxy inverso\n"
+            "b) Proxy caché\n"
+            "c) Proxy abierto", "b"),
+            ("¿Qué ventaja tiene usar un proxy corporativo?\n"
+            "a) Controlar el acceso a sitios web\n"
+            "b) Aumentar el tamaño del disco duro\n"
+            "c) Reducir el número de empleados", "a")
+        ])
+
+        servidor_web = Nodo("Servidor Web", [
+            ("¿Qué ataque explota formularios sin validación?\n"
+            "a) DDoS\n"
+            "b) Phishing\n"
+            "c) Inyección SQL", "c"),
+            ("¿Qué medida reduce el riesgo de ataques XSS?\n"
+            "a) Usar contraseñas largas\n"
+            "b) Escapar o validar entradas del usuario\n"
+            "c) Reiniciar el servidor", "b"),
+            ("¿Qué protocolo usa HTTPS?\n"
+            "a) SSH\n"
+            "b) TLS/SSL\n"
+            "c) FTP", "b")
+        ])
+
+        base_datos = Nodo("Base de Datos", [
+            ("¿Qué protege mejor una base de datos?\n"
+            "a) Cifrar datos\n"
+            "b) Dejar acceso libre\n"
+            "c) Contraseñas simples", "a"),
+            ("¿Qué práctica es peligrosa al gestionar bases de datos?\n"
+            "a) Aplicar backups automáticos\n"
+            "b) Usar usuarios administrativos para todo\n"
+            "c) Tener un firewall activo", "b"),
+            ("¿Qué comando en SQL puede eliminar información permanentemente?\n"
+            "a) DROP\n"
+            "b) SELECT\n"
+            "c) INSERT", "a")
+        ])
+
+        firewall = Nodo("Firewall Perimetral", [
+            ("¿Cuál es la función principal de un firewall?\n"
+            "a) Guardar archivos en la nube\n"
+            "b) Detectar virus automáticamente\n"
+            "c) Filtrar tráfico entre redes", "c"),
+            ("¿Qué tipo de firewall examina el contenido de los paquetes?\n"
+            "a) De circuito\n"
+            "b) De inspección profunda (DPI)\n"
+            "c) De hardware", "b"),
+            ("¿Qué puede causar una mala configuración del firewall?\n"
+            "a) Bloqueo de servicios legítimos\n"
+            "b) Mayor velocidad de conexión\n"
+            "c) Autenticación automática", "a")
+        ])
+
+        correo = Nodo("Servidor de Correo", [
+            ("Identifica el phishing:\n"
+            "a) Correo con enlace sospechoso\n"
+            "b) Correo sin adjuntos\n"
+            "c) Correo interno legítimo", "a"),
+            ("¿Qué protocolo se usa para enviar correos?\n"
+            "a) IMAP\n"
+            "b) POP3\n"
+            "c) SMTP", "c"),
+            ("¿Qué medida ayuda a evitar correos falsificados?\n"
+            "a) Implementar SPF o DKIM\n"
+            "b) Desactivar el antivirus\n"
+            "c) Usar contraseñas cortas", "a")
+        ])
+
+        raiz = Nodo("Servidor Principal", [
+            ("Detecta la vulnerabilidad más grave:\n"
+            "a) Sistema actualizado\n"
+            "b) Contraseña débil\n"
+            "c) Antivirus activo", "b"),
+            ("¿Qué acción mejora la seguridad de un servidor?\n"
+            "a) Usar la misma clave para todo\n"
+            "b) Apagar el firewall\n"
+            "c) Aplicar parches y actualizaciones", "c"),
+            ("¿Qué herramienta se usa para monitorear el rendimiento del servidor?\n"
+            "a) Wireshark\n"
+            "b) Task Manager o top\n"
+            "c) Paint", "b")
+        ])
+
         logs_servidor = Nodo("Logs de Servidor", [
             ("Si ves muchos intentos de contraseña fallidos en los registros, ¿qué puede estar pasando?\n"
-            "a) Alguien está probando muchas contraseñas\n"
-            "b) El computador está apagado\n"
-            "c) Hay un problema con el teclado", "a")
+            "a) Ataque de fuerza bruta\n"
+            "b) Usuario sin permisos\n"
+            "c) Error del teclado", "a"),
+            ("¿Por qué es útil centralizar los logs?\n"
+            "a) Ocupa menos espacio\n"
+            "b) Facilita la detección de anomalías\n"
+            "c) Evita el uso de antivirus", "b"),
+            ("¿Qué formato se usa comúnmente para logs?\n"
+            "a) JSON o texto plano\n"
+            "b) PDF\n"
+            "c) JPEG", "a")
         ])
+
         gestion_parches = Nodo("Gestión de Parches", [
             ("Cuando un programa tiene un error de seguridad, el fabricante envía una 'actualización'. ¿Qué debes hacer?\n"
-            "a) Instalar la actualización de inmediato\n"
-            "b) Esperar un año para instalarla\n"
-            "c) Borrar el programa", "a")
+            "a) Esperar un año\n"
+            "b) Instalar la actualización de inmediato\n"
+            "c) Ignorarla", "b"),
+            ("¿Qué pasa si no aplicas los parches de seguridad?\n"
+            "a) El sistema puede ser vulnerable a ataques conocidos\n"
+            "b) Mejora el rendimiento\n"
+            "c) Se actualiza solo", "a"),
+            ("¿Qué herramienta automatiza la instalación de parches?\n"
+            "a) Windows Update o apt\n"
+            "b) Paint\n"
+            "c) Task Manager", "a")
         ])
+
+
 
         configuracion = random.choice([1, 2, 3])
 
@@ -193,12 +288,12 @@ class JuegoCiberseguridadCTK:
         self.nodo_central.izquierda = None
         self.nodo_central.derecha = None
 
-        print(f"🌲 Configuración seleccionada: {configuracion}")
+        print(f"Configuración seleccionada: {configuracion}")
         return raiz
 
 
 
-    # --- Mostrar nodo actual ---
+    # Mostrar nodo actual
     def mostrar_nodo(self):
         self.texto_nodo.configure(text=f"🔹 Estás en: {self.actual.nombre}")
         self.texto_reto.configure(text=self.pregunta_actual)
@@ -215,7 +310,7 @@ class JuegoCiberseguridadCTK:
             self.actualizar_mapa()
 
 
-    # --- Lista de nodos visitados --- (Ajna)
+    # Lista de nodos visitados (Ajna)
     def actualizar_lista_nodos(self):
         for widget in self.frame_nodos.winfo_children():
             widget.destroy()
@@ -246,7 +341,7 @@ class JuegoCiberseguridadCTK:
                self.buscar_nodo_por_nombre(raiz.derecha, nombre)
 
 
-    # --- Validación de respuesta --- (Vala)
+    # Validación de respuesta (Vala)
     def validar_respuesta(self):
         respuesta = self.entrada.get().strip().lower()
 
@@ -256,7 +351,7 @@ class JuegoCiberseguridadCTK:
             return
 
         if respuesta != self.respuesta_correcta:
-            messagebox.showwarning("Incorrecto", "❌ Respuesta incorrecta. Te llegó un nuevo desafío...")
+            messagebox.showwarning("Incorrecto", "❌ Respuesta incorrecta")
             self.pregunta_actual, self.respuesta_correcta = self.actual.obtener_reto()
             self.mostrar_nodo()
         else:
@@ -272,7 +367,7 @@ class JuegoCiberseguridadCTK:
                 self.mostrar_pista()
 
 
-    # --- Movimiento entre nodos ---
+    # Movimiento entre nodos 
     def mover(self, direccion):
         if direccion == "izquierda" and self.actual.izquierda:
             self.actual = self.actual.izquierda
@@ -286,7 +381,7 @@ class JuegoCiberseguridadCTK:
         self.mostrar_nodo()
 
 
-    # --- Pistas y mapa --- (Ajna)
+    # Pistas y mapa (Ajna)
     def mostrar_pista(self):
         if not self.mapa_visible:
             self.frame_mapa.pack(fill="both", expand=True, padx=10, pady=10)
@@ -319,7 +414,7 @@ class JuegoCiberseguridadCTK:
                     text=f"💡 Desde aquí, el objetivo está hacia la {siguiente_dir}"
                 )
             else:
-                self.label_pista.configure(text="🤔 Ya casi llegas al nodo final.")
+                self.label_pista.configure(text="Ya casi llegas al nodo final.")
         else:
             # Caso 2: si el nodo actual no está en el camino correcto
             self.label_pista.configure(
